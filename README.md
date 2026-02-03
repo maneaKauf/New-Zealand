@@ -1,6 +1,6 @@
-# New Zealand Seagrass Project
+# Seagrass Project
 
-This repository contains data and R scripts for the analysis of seagrass in New Zealand.
+This repository contains data and R scripts for the analysis of seagrass acroos Caribbean.
 
 ## Folder Structure
 - `RawData/`: Contains all raw CSV data files.
