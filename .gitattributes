@@ -1,0 +1,2 @@
+RawData/* filter=lfs diff=lfs merge=lfs -text
+IntermediateData/* filter=lfs diff=lfs merge=lfs -text
