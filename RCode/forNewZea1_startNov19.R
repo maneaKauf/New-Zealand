@@ -1,0 +1,850 @@
+## control, shift, h and add folder for setwd
+# working directory set to forNewZea
+
+library(dplyr)
+
+## dry tortuga loadings
+dt2016 <- read_csv("dt2016.csv")
+dt2018 <- read_csv("dt2018.csv")
+dt2021 <- read_csv("dt2021.csv") #primary sampling unit double V
+dt2023 <- read_csv("dt2023.csv") 
+dt2024 <- read_csv("dt2024.csv")
+
+## redo
+dry_tort <- bind_rows(dt2016,dt2018,dt2021,dt2023,dt2024)
+
+dt2021$PRIMARY_SAMPLE_UNIT <- as.character(dt2021$PRIMARY_SAMPLE_UNIT)
+dt2023$PRIMARY_SAMPLE_UNIT <- as.character(dt2023$PRIMARY_SAMPLE_UNIT)
+dt2024$PRIMARY_SAMPLE_UNIT <- as.character(dt2024$PRIMARY_SAMPLE_UNIT)
+
+## works
+dry_tort <- bind_rows(dt2016,dt2018,dt2021,dt2023,dt2024)
+
+## flower gardens loadings
+fgb2018 <- read_csv("fgb2018.csv")
+fgb2022 <- read_csv("fgb2022.csv")
+fgb2023 <- read_csv("fgb2023.csv")
+fgb2024 <- read_csv("fgb2024.csv")
+
+## worked first time
+flo_gard <- bind_rows(fgb2018,fgb2022,fgb2023,fgb2024)
+
+
+## flordia keys loadings
+fk2016 <- read_csv("fk2016.csv")
+fk2018 <- read_csv("fk2018.csv")
+fk2022 <- read_csv("fk2022.csv") #primary sampling unit double
+fk2024 <- read_csv("fk2024.csv")
+
+## redo
+fla_keys <- bind_rows(fk2016,fk2018,fk2022,fk2024)
+
+fk2022$PRIMARY_SAMPLE_UNIT <- as.character(fk2022$PRIMARY_SAMPLE_UNIT)
+fk2024$PRIMARY_SAMPLE_UNIT <- as.character(fk2024$PRIMARY_SAMPLE_UNIT)
+
+## works
+fla_keys <- bind_rows(fk2016,fk2018,fk2022,fk2024)
+
+
+## puerto rico loadings
+prico2016 <- read_csv("prico2016.csv")
+prico2019 <- read_csv("prico2019.csv")
+prico2021 <- read_csv("prico2021.csv")
+prico2023 <- read_csv("prico2023.csv")
+
+## worked first time
+p_rico <- bind_rows(prico2016,prico2019,prico2021,prico2023)
+
+
+## SE peninsula florida loadings
+sefcri2015 <- read_csv("sefcri2015.csv")
+sefcri2016 <- read_csv("sefcri2016.csv")
+sefcri2018 <- read_csv("sefcri2018.csv")
+sefcri2021 <- read_csv("sefcri2021.csv")
+sefcri2022 <- read_csv("sefcri2022.csv")
+sefcri2024 <- read_csv("sefcri2024.csv")
+
+## redo
+se_fla <- bind_rows(sefcri2015,sefcri2016,sefcri2018,sefcri2021,sefcri2022,sefcri2024)
+
+## after 2021 all the primary sampling units 
+
+summary(sefcri2021)
+
+sefcri2021$PRIMARY_SAMPLE_UNIT <- as.character(sefcri2021$PRIMARY_SAMPLE_UNIT)
+sefcri2022$PRIMARY_SAMPLE_UNIT <- as.character(sefcri2022$PRIMARY_SAMPLE_UNIT)
+sefcri2024$PRIMARY_SAMPLE_UNIT <- as.character(sefcri2024$PRIMARY_SAMPLE_UNIT)
+
+## works
+se_fla <- bind_rows(sefcri2015,sefcri2016,sefcri2018,sefcri2021,sefcri2022,sefcri2024)
+
+
+## St. Thomas + St. John
+sttstj2017 <- read_csv("sttstj2017.csv")
+sttstj2019 <- read_csv("sttstj2019.csv")
+sttstj2021 <- read_csv("sttstj2021.csv")
+sttstj2023 <- read_csv("sttstj2023.csv")
+
+## worked first time
+st_tandj <- bind_rows(sttstj2017,sttstj2019,sttstj2021,sttstj2023)
+
+
+## St. Croix
+stx2017 <- read_csv("stx2017.csv")
+stx2019 <- read_csv("stx2019.csv")
+stx2021 <- read_csv("stx2021.csv")
+stx2023 <- read_csv("stx2023.csv")
+
+## worked first time
+st_c <- bind_rows(stx2017,stx2019,stx2021,stx2023)
+
+flo_gard$PRIMARY_SAMPLE_UNIT <- as.character(flo_gard$PRIMARY_SAMPLE_UNIT)
+p_rico$PRIMARY_SAMPLE_UNIT <- as.character(p_rico$PRIMARY_SAMPLE_UNIT)
+st_tandj$PRIMARY_SAMPLE_UNIT <- as.character(st_tandj$PRIMARY_SAMPLE_UNIT)
+st_c$PRIMARY_SAMPLE_UNIT <- as.character(st_c$PRIMARY_SAMPLE_UNIT)
+
+
+all_regions <- bind_rows(dry_tort,flo_gard,fla_keys,p_rico,se_fla,st_tandj,st_c)
+
+
+summary(all_regions)
+hist(all_regions$YEAR)
+hist(all_regions$MONTH)
+
+## all_regions has all my stuff
+
+## adding in GREATER_REGION
+# gulf_mex
+flo_gard$GREATER_REGION <- c("gulf_mex")
+# florida
+dry_tort$GREATER_REGION <- c("florida")
+fla_keys$GREATER_REGION <- c("florida")
+se_fla$GREATER_REGION <- c("florida")
+# carribean
+p_rico$GREATER_REGION <- c("carribean")
+st_tandj$GREATER_REGION <- c("carribean")
+st_c$GREATER_REGION <- c("carribean")
+
+all_regions <- bind_rows(dry_tort,flo_gard,fla_keys,p_rico,se_fla,st_tandj,st_c)
+
+## checking that greater region was added
+table(all_regions$GREATER_REGION)
+#carribean   florida  gulf_mex 
+#1464615   3537424    101339 
+
+## loading ggplot for visualizations
+library(ggplot2)
+
+## dataset info
+summary(all_regions)
+
+## getting the habitat types
+all_regions$habitat_type <- sub("_.*", "", all_regions$HABITAT_CD)
+
+## getting the rugosity 
+all_regions$rugosity <- sub(".*_", "", all_regions$HABITAT_CD)
+all_regions$rugosity <- factor(all_regions$rugosity, levels = c("HR", "MR", "LR"), ordered = TRUE)
+
+## need to figure out zone stuff SKIP for now 
+## onlne hey mention 4 but they have recorded 7 ... what are 5-7
+hist(all_regions$ZONE_NR)
+
+summary(all_regions$ZONE_NR)
+list(all_regions$ZONE_NR)
+rowsum(all_regions$ZONE_NR)
+
+
+## looking at depth 
+hist(all_regions$DEPTH)
+
+
+## figuring out seasons 
+hist(all_regions$MONTH)
+
+# raining season = june-november
+# dry season = december-may
+
+all_regions$season <- ifelse(all_regions$MONTH > 5 & all_regions$MONTH < 12, "rain", "dry")
+print(all_regions$season)
+
+
+## doing depth again ... binning?
+all_regions$DEPTHlog <- log(all_regions$DEPTH)
+hist(all_regions$DEPTHlog)
+
+
+## testing graphs 
+library(ggplot2)
+
+# dodge by region
+# stack by habitat
+
+ggplot(all_regions, 
+       aes(x = GREATER_REGION, fill = habitat_type)) +
+  geom_bar(
+    #stat = "identity",
+    position = position_dodge(width = 0.9),           # puts Wet and Dry side-by-side
+    aes(group = interaction(season, habitat_type))         # stack habitats within each season bar
+  ) +
+  labs(
+    x = "Region",
+    y = "Species Frequency",
+    fill = "Habitat Type",
+    title = "Species Frequency by Region, Season, and Habitat"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(all_regions, 
+       aes(x = GREATER_REGION, fill = habitat_type)) +
+  geom_bar(
+    position = position_dodge(width = 0.9),           # puts Wet and Dry side-by-side
+    aes(group = season)         # stack habitats within each season bar
+  ) +
+  labs(
+    x = "Region",
+    y = "Species Frequency",
+    fill = "Habitat Type",
+    title = "Species Frequency by Region, Season, and Habitat"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(all_regions, aes(x = GREATER_REGION, y = "count", fill = habitat_type)) +
+  geom_bar(stat = "count", position = position_dodge(width = 0.9)) +
+  aes(group = season) 
+  
+ggplot(all_regions, aes(x = GREATER_REGION, fill = habitat_type)) +
+  geom_bar(aes(group = season), position = position_dodge(width = 0.9))
+
+
+## works, they mainly collected during rainy season, so hard to make comparison
+ggplot(all_regions, aes(x = GREATER_REGION, fill = habitat_type)) +
+  geom_bar(aes(group = season), position = position_dodge(width = 0.9)) #+
+  #facet_wrap(~season)  # creates one panel per season
+
+
+## comparing MPA vs no MPA
+# need to make MPA column, MPA_NR says which MPA not yes or no
+all_regions$inMPA <- ifelse(all_regions$MPA_NR > 0, "YES", "NO")
+print(all_regions$inMPA)
+
+ggplot(all_regions, aes(x = GREATER_REGION, fill = habitat_type)) +
+  geom_bar(aes(group = inMPA), position = position_dodge(width = 0.9)) #+
+  #facet_wrap(~inMPA)  # creates one panel per season
+
+# looks like they only looks at MPAs in Florida, can focus on this in project, but not right now 
+
+
+## comparing time 1 vs time 2
+#need a column for timeframes 
+all_regions$timeframe <- ifelse(all_regions$YEAR < 2020, "time1", "time2")
+print(all_regions$timeframe)
+
+ggplot(all_regions, aes(x = GREATER_REGION, fill = habitat_type)) +
+  geom_bar(aes(group = timeframe), position = position_dodge(width = 0.9)) #+
+  #facet_wrap(~timeframe)  # creates one panel per season
+
+
+
+### NEED TO CONSIDER RICHNESS
+# df = all_regions
+# each data point is a fish
+# SPECIES_CD = the species of that fish
+# GREATER_REGION = region data point was taken, there are 3 regions, carribean, florida, and gulf_mex
+# season = season that point was collected, there are two seasons, rain and dry
+# timeframe = time period point was collected, there are 2 timeframes, time1 and time2
+# i want to create a graph like this: 
+# y = species richness, the number of unique species, i.e. unique SPECIES_CD values
+# x = region
+
+length(unique(all_regions$SPECIES_CD[all_regions$GREATER_REGION == "gulf_mex"]))
+# richness the same/really close in each by species
+
+# Create GENUS column from first 3 letters of SPECIES_CD
+all_regions$GENUS <- substr(all_regions$SPECIES_CD, 1, 3)
+length(unique(all_regions$GENUS[all_regions$GREATER_REGION == "florida"]))
+
+
+# species richness per region
+richness <- all_regions %>%
+  group_by(GREATER_REGION) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness, aes(x = GREATER_REGION, y = species_richness)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_bar(aes(group = timeframe), position = position_dodge(width = 0.9))
+ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region")
+
+# basically all had the same richness
+# lets see if it changes by time ...
+
+# species richness per region and timeframe
+richness_time <- all_regions %>%
+  group_by(GREATER_REGION, timeframe) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_time, aes(x = GREATER_REGION, y = species_richness, fill = timeframe)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and Timeframe")
+
+# basically all the same again ...
+# changes by habitat type?
+
+# species richness per region and habitat
+richness_habitat <- all_regions %>%
+  group_by(GREATER_REGION, habitat_type) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_habitat, aes(x = GREATER_REGION, y = species_richness, fill = habitat_type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and Habitat")
+
+
+# basically all the same again ...
+# changes by season?
+
+# species richness per region and season
+richness_season <- all_regions %>%
+  group_by(GREATER_REGION, season) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_season, aes(x = GREATER_REGION, y = species_richness, fill = season)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and Season")
+
+# basically all the same again ...
+# changes by MPA?
+
+# species richness per region and MPA
+richness_MPA <- all_regions %>%
+  group_by(GREATER_REGION, inMPA) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_MPA, aes(x = GREATER_REGION, y = species_richness, fill = inMPA)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and MPA")
+
+# lets look at just florida, i.e. divided regions
+richness_MPA_smallR <- all_regions %>%
+  group_by(REGION, inMPA) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_MPA_smallR, aes(x = REGION, y = species_richness, fill = inMPA)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and MPA")
+
+
+### HAVE TONLOOK AT SOMETHING ELSE
+## EXPLORING FUNCTIONALITY?
+
+hist(all_regions$LEN)
+
+library(dplyr)
+
+# mean length per region
+all_regions %>%
+  group_by(GREATER_REGION) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    min_len = min(LEN, na.rm = TRUE),
+    max_len = max(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE),
+    n = n()
+  )
+
+# by region and timeframe
+all_regions %>%
+  group_by(GREATER_REGION, timeframe) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  )
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = timeframe)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and Timeframe")
+
+#GREATER_REGION timeframe mean_len median_len sd_len
+#<chr>          <chr>        <dbl>      <dbl>  <dbl>
+#1 carribean      time1         2.01          0   6.18
+#2 carribean      time2         2.46          0   6.72
+#3 florida        time1         2.84          0   7.78
+#4 florida        time2         3.07          0   8.04
+#5 gulf_mex       time1         3.15          0  10.6 
+#6 gulf_mex       time2         3.54          0   9.72
+
+
+# by region and season
+all_regions %>%
+  group_by(GREATER_REGION, season) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  )
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = season)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and Season")
+
+#GREATER_REGION season mean_len median_len sd_len
+#<chr>          <chr>     <dbl>      <dbl>  <dbl>
+#1 carribean      dry        2.87          0   7.06
+#2 carribean      rain       2.19          0   6.41
+#3 florida        dry        3.59          0   8.51
+#4 florida        rain       2.90          0   7.85
+#5 gulf_mex       rain       3.46          0   9.92
+
+
+# by region and MPA
+all_regions %>%
+  group_by(GREATER_REGION, inMPA) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  )
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = inMPA)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and MPA")
+
+#GREATER_REGION inMPA mean_len median_len sd_len
+#<chr>          <chr>    <dbl>      <dbl>  <dbl>
+#1 carribean      NA~        2.21          0   6.42
+#2 florida        NO        2.67          0   7.40
+#3 florida        YES       3.41          0   8.64
+#4 florida        NA~        5.35          0  11.3 
+#5 gulf_mex       NA~        3.46          0   9.92
+
+# by just florida and MPA
+all_regions %>%
+  group_by(REGION, inMPA) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  )
+ggplot(all_regions, aes(x = REGION, y = LEN, fill = inMPA)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and MPA")
+
+#REGION   inMPA mean_len median_len sd_len
+#<chr>    <chr>    <dbl>      <dbl>  <dbl>
+#1 DRY TORT NO        2.96          0   7.98
+#2 DRY TORT YES       3.72          0   9.31
+#3 DRY TORT ~NA        5.35          0  11.3 
+#4 FLA KEYS NO        2.83          0   7.25
+#5 FLA KEYS YES       3.05          0   7.79
+#6 GOM      ~~NA        3.46          0   9.92
+#7 PRICO    ~~NA        2.24          0   6.58
+#8 SEFCRI   NO        2.46          0   7.30
+#9 STTSTJ   ~~NA        2.18          0   6.21
+#10 STX     ~~NA        2.20          0   6.50
+
+
+# by region and habitat
+all_regions %>%
+  group_by(GREATER_REGION, habitat_type) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  ) %>%
+print(n = Inf)
+
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = habitat_type)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and Habitat")
+
+#GREATER_REGION habitat_type mean_len median_len sd_len
+#<chr>          <chr>           <dbl>      <dbl>  <dbl>
+#1 carribean      AGRF             2.52          0   6.77
+#2 carribean      BDRK             2.21          0   6.05
+#3 carribean      HARD             2.34          0   7.11
+#4 carribean      PTRF             2.54          0   6.87
+#5 carribean      PVMT             1.80          0   5.81  low
+#6 carribean      SCR              1.21          0   4.80  low
+#7 florida        APRD             2.63          0   7.38
+#8 florida        APRS             2.13          0   5.35
+#9 florida        CONT             3.26          0   8.27
+#10 florida        CPDP             3.04          0   8.02
+#11 florida        CPSH             1.51          0   5.89  low
+#12 florida        DPRC             2.41          0   8.43
+#13 florida        ISOL             3.07          0   8.00
+#14 florida        LIRI             2.62          0   6.44
+#15 florida        LIRM             2.72          0   6.95
+#16 florida        LIRO             3.27          0   8.54
+#17 florida        PTCH             2.75          0   7.52
+#18 florida        RGDP             2.66          0   8.31
+#19 florida        RGSH             1.64          0   5.21  low
+#20 florida        RUBB             1.41          0   5.20  low
+#21 florida        SCRS             1.94          0   6.56  low
+#22 florida        SPGR             3.30          0   8.33
+#23 gulf_mex       HR               3.51          0   9.97
+#24 gulf_mex       LR               2.54          0   8.71
+
+
+### TIME TO FIX MY HABITATS
+length(unique(all_regions$HABITAT_CD))
+# 32
+list(unique(all_regions$HABITAT_CD))
+#[1]  "CONT_MR" "CONT_LR" "CONT_HR" "SPGR_HR" "ISOL_HR" "ISOL_MR" "RUBB_LR" "ISOL_LR" "SPGR_LR"
+#[10] "SPGR_MR" "LR"      "HR"      "RUBB_MR" "AGRF"    "PTRF"    "PVMT"    "BDRK"    "SCR"    
+#[19] "HARD"    "CPSH"    "RGSH"    "LIRI"    "LIRM"    "APRD"    "PTCH"    "CPDP"    "LIRO"   
+#[28] "SPGR"    "RGDP"    "DPRC"    "SCRS"    "APRS"
+sort(unique(all_regions$HABITAT_CD))
+
+length(unique(all_regions$habitat_type))
+# 24
+list(unique(all_regions$habitat_type))
+#[1] "CONT" "SPGR" "ISOL" "RUBB" "LR"   "HR"   "AGRF" "PTRF" "PVMT" "BDRK" "SCR"  "HARD" "CPSH" "RGSH"
+#[15] "LIRI" "LIRM" "APRD" "PTCH" "CPDP" "LIRO" "RGDP" "DPRC" "SCRS" "APRS"
+
+
+### ADDING OTHER COLUMNS OF HABITAT STUFF
+## COMPLEXITY 
+# create a named lookup vector
+habitat_complexity <- c(AGRF = "moderate", APRD = "moderate", APRS = "moderate", BDRK = "low", CONT_HR = "high",
+                        CONT_LR = "moderate", CONT_MR = "moderate", CPDP = "low", CPSH = "low", DPRC = "high", 
+                        HARD = "low", HR = "high", ISOL_HR = "high", ISOL_LR = "moderate", ISOL_MR = "moderate", 
+                        LIRI = "moderate", LIRM = "moderate", LIRO = "high", LR = "moderate", PTCH = "moderate", 
+                        PTRF = "moderate", PVMT = "low", RGDP = "high", RGSH = "moderate", RUBB_LR = "low", 
+                        RUBB_MR = "moderate", SCR = "low", SCRS = "low", SPGR = "moderate", SPGR_HR = "high", 
+                        SPGR_LR = "moderate", SPGR_MR = "moderate")
+
+# add column 'complexity'
+all_regions$my_complexity <- habitat_complexity[all_regions$HABITAT_CD]
+
+print(all_regions$my_complexity)
+
+
+## SAND PRESENCE 
+# create a named lookup vector
+habitat_sand <- c(AGRF = "sand", APRD = "sand", APRS = "sand", BDRK = "absent", CONT_HR = "absent",
+                  CONT_LR = "absent", CONT_MR = "absent", CPDP = "absent", CPSH = "absent", DPRC = "absent", 
+                  HARD = "absent", HR = "absent", ISOL_HR = "sand", ISOL_LR = "sand", ISOL_MR = "sand", 
+                  LIRI = "sand", LIRM = "absent", LIRO = "absent", LR = "absent", PTCH = "sand", 
+                  PTRF = "sand", PVMT = "absent", RGDP = "absent", RGSH = "sand", RUBB_LR = "absent", 
+                  RUBB_MR = "absent", SCR = "sand", SCRS = "sand", SPGR = "sand", SPGR_HR = "sand", 
+                  SPGR_LR = "sand", SPGR_MR = "sand")
+
+# add column 'complexity'
+all_regions$my_sand <- habitat_sand[all_regions$HABITAT_CD]
+
+print(all_regions$my_sand)
+
+
+## VERTICAL RELIEF 
+# create a named lookup vector
+habitat_relief <- c(AGRF = "moderate", APRD = "moderate", APRS = "moderate", BDRK = "low", CONT_HR = "high",
+                  CONT_LR = "low", CONT_MR = "moderate", CPDP = "low", CPSH = "low", DPRC = "high", 
+                  HARD = "low", HR = "high", ISOL_HR = "high", ISOL_LR = "low", ISOL_MR = "moderate", 
+                  LIRI = "low", LIRM = "moderate", LIRO = "high", LR = "low", PTCH = "moderate", 
+                  PTRF = "moderate", PVMT = "low", RGDP = "high", RGSH = "moderate", RUBB_LR = "low", 
+                  RUBB_MR = "moderate", SCR = "low", SCRS = "low", SPGR = "moderate", SPGR_HR = "high", 
+                  SPGR_LR = "low", SPGR_MR = "moderate")
+
+# add column 'complexity'
+all_regions$my_relief <- habitat_relief[all_regions$HABITAT_CD]
+
+print(all_regions$my_relief)
+
+
+
+### tests again but with these 3 instead of habitat type
+## STARTING WITH COMPLEXITY 
+# my_complexity
+
+# dodge by region
+# stack by habitat
+
+      ggplot(all_regions, 
+             aes(x = GREATER_REGION, fill = my_complexity)) +
+        geom_bar(
+          #stat = "identity",
+          position = position_dodge(width = 0.9),           # puts Wet and Dry side-by-side
+          aes(group = interaction(season, my_complexity))         # stack habitats within each season bar
+        ) +
+        labs(
+          x = "Region",
+          y = "Species Frequency",
+          fill = "Complexity",
+          title = "Species Frequency by Region, Season, and Habitat Complexity"
+        ) +
+        theme_bw() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  ## no labs :( i cant tell what is what
+        ggplot(all_regions, 
+               aes(x = GREATER_REGION, fill = my_complexity)) +
+          geom_bar(
+            position = position_dodge(width = 0.9),           
+            aes(group = my_complexity)         # the no labs comment was made when this said group = season
+          ) +
+          labs(
+            x = "Region",
+            y = "Species Frequency",
+            fill = "Complexity",
+            title = "Species Frequency by Region, Season, and Habitat Complexity"
+          ) +
+          theme_bw() +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  ## the no lans looked like this one ... again no labs
+      ggplot(all_regions, aes(x = GREATER_REGION, fill = my_complexity)) +
+        geom_bar(aes(group = season), position = position_dodge(width = 0.9))
+
+
+## WORKS, shows my complexity for rainy and dry season side by side
+      ## basically a better working version of the 3 above this 
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_complexity)) +
+  geom_bar(aes(group = my_complexity), position = position_dodge(width = 0.9)) +
+  facet_wrap(~season)  # creates one panel per season
+
+## WORKS, comparing MPA vs no MPA
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_complexity)) +
+  geom_bar(aes(group = my_complexity), position = position_dodge(width = 0.9)) +
+  facet_wrap(~inMPA)  # creates one panel per season
+# looks like they only looks at MPAs in Florida, can focus on this in project, but not right now 
+
+## WORKS, comparing time 1 vs time 2
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_complexity)) +
+  geom_bar(aes(group = my_complexity), position = position_dodge(width = 0.9)) +
+  facet_wrap(~timeframe)  # creates one panel per season
+
+# ALL SAME, species richness per region and habitat
+richness_complexity <- all_regions %>%
+  group_by(GREATER_REGION, my_complexity) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_complexity, aes(x = GREATER_REGION, y = species_richness, fill = my_complexity)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and Habitat Complexity")
+
+# by region and habitat
+all_regions %>%
+  group_by(GREATER_REGION, my_complexity) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  ) %>%
+  print(n = Inf)
+
+#GREATER_REGION my_complexity mean_len median_len sd_len
+#<chr>          <chr>            <dbl>      <dbl>  <dbl>
+#1 carribean      low               1.87          0   5.97
+#2 carribean      moderate          2.53          0   6.80
+#3 florida        high              3.57          0   9.05
+#4 florida        low               1.78          0   6.24
+#5 florida        moderate          2.66          0   7.18
+#6 gulf_mex       high              3.51          0   9.97
+#7 gulf_mex       moderate          2.54          0   8.71
+
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = my_complexity)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and Habitat Complexity")
+
+
+## SECOND IS SAND BABAY 
+# my_sand
+
+# dodge by region
+# stack by habitat
+
+## WORKS, shows my complexity for rainy and dry season side by side
+## basically a better working version of the 3 above this 
+# looking with season
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_sand)) +
+  geom_bar(aes(group = my_sand), position = position_dodge(width = 0.9)) +
+  facet_wrap(~season)  # creates one panel per season
+
+## WORKS, comparing MPA vs no MPA
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_sand)) +
+  geom_bar(aes(group = my_sand), position = position_dodge(width = 0.9)) +
+  facet_wrap(~inMPA)  # creates one panel per season
+# looks like they only looks at MPAs in Florida, can focus on this in project, but not right now 
+
+## WORKS, comparing time 1 vs time 2
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_sand)) +
+  geom_bar(aes(group = my_sand), position = position_dodge(width = 0.9)) +
+  facet_wrap(~timeframe)  # creates one panel per season
+
+# ALL SAME, species richness per region and habitat
+richness_sand <- all_regions %>%
+  group_by(GREATER_REGION, my_sand) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_sand, aes(x = GREATER_REGION, y = species_richness, fill = my_sand)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and Habitat Sand")
+
+# by region and habitat
+all_regions %>%
+  group_by(GREATER_REGION, my_sand) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  ) %>%
+  print(n = Inf)
+
+#GREATER_REGION my_sand mean_len median_len sd_len
+#<chr>          <chr>      <dbl>      <dbl>  <dbl>
+#1 carribean      absent      1.97          0   6.14
+#2 carribean      sand        2.37          0   6.61
+#3 florida        absent      2.91          0   7.99
+#4 florida        sand        2.97          0   7.78
+#5 gulf_mex       absent      3.46          0   9.92
+
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = my_sand)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and Habitat Sand")
+
+
+## THIRD IS RELIEF BABAY 
+# my_relief
+
+# dodge by region
+# stack by habitat
+
+## WORKS, shows my complexity for rainy and dry season side by side
+## basically a better working version of the 3 above this 
+# looking with season
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_relief)) +
+  geom_bar(aes(group = my_relief), position = position_dodge(width = 0.9)) +
+  facet_wrap(~season)  # creates one panel per season
+
+## WORKS, comparing MPA vs no MPA
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_relief)) +
+  geom_bar(aes(group = my_relief), position = position_dodge(width = 0.9)) +
+  facet_wrap(~inMPA)  # creates one panel per season
+# looks like they only looks at MPAs in Florida, can focus on this in project, but not right now 
+
+## WORKS, comparing time 1 vs time 2
+ggplot(all_regions, aes(x = GREATER_REGION, fill = my_relief)) +
+  geom_bar(aes(group = my_relief), position = position_dodge(width = 0.9)) +
+  facet_wrap(~timeframe)  # creates one panel per season
+# very big decrease of species in areas with low relief in the second time frame
+# small increase of species in areas with high relief in the second time frame
+# small decrease of species in areas with moderate relief in the second time frame
+#### LOOK INTO THIS!!
+
+# ALL SAME, species richness per region and habitat
+richness_relief <- all_regions %>%
+  group_by(GREATER_REGION, my_relief) %>%
+  summarise(species_richness = n_distinct(SPECIES_CD))
+
+ggplot(richness_relief, aes(x = GREATER_REGION, y = species_richness, fill = my_relief)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  ylab("Species Richness") +
+  xlab("Region") +
+  ggtitle("Species Richness per Region and Habitat Relief")
+
+# by region and habitat
+all_regions %>%
+  group_by(GREATER_REGION, my_relief) %>%
+  summarise(
+    mean_len = mean(LEN, na.rm = TRUE),
+    median_len = median(LEN, na.rm = TRUE),
+    sd_len = sd(LEN, na.rm = TRUE)
+  ) %>%
+  print(n = Inf)
+
+#GREATER_REGION my_relief mean_len median_len sd_len
+#<chr>          <chr>        <dbl>      <dbl>  <dbl>
+#1 carribean      low           1.87          0   5.97
+#2 carribean      moderate      2.53          0   6.80
+#3 florida        high          3.57          0   9.05
+#4 florida        low           2.23          0   6.58
+#5 florida        moderate      2.83          0   7.46
+#6 gulf_mex       high          3.51          0   9.97
+#7 gulf_mex       low           2.54          0   8.71
+
+ggplot(all_regions, aes(x = GREATER_REGION, y = LEN, fill = my_relief)) +
+  geom_boxplot() +
+  ylab("Length (cm)") +
+  xlab("Region") +
+  ggtitle("Fish Lengths by Region and Habitat Relief")
+
+
+## FIGURING OUT DEPTH
+summary(all_regions$DEPTH)
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#0.00    6.60   12.20   13.08   19.35   33.20  101339 
+
+## FIGURING OUT DISTANCE TO SHORELINE
+summary(all_regions$ZONE_NR)
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#0.0     4.0     4.0     4.1     4.0     7.0 2717339
+
+#LOTS OF NAS... i will calculate on my own
+install.packages(c("sf", "geosphere", "rnaturalearth", "rnaturalearthdata"))
+library(sf)
+library(geosphere)
+library(rnaturalearth) #coastline data
+library(rnaturalearthdata) #world map data
+
+# 1. Get Coastline Data (e.g., world coastline)
+world <- ne_coastline(scale = "medium", returnclass = "sf")
+coast_line <- st_cast(world, "LINESTRING") 
+
+# 2. Create Your Points (Replace with your data)
+#my_points <- data.frame(
+#  id = 1:3,
+#  lat = c(34.05, 25.76, 30.00),
+#  lon = c(-118.24, -80.19, 31.20)
+#)
+points_sf <- st_as_sf(all_regions$DEPTH, coords = c("LON_DEGREES", "LAT_DEGREES"), crs = 4326)
+
+# 3. Calculate Distance to Line
+# This can be slow for many points; use a spatial index for very large datasets
+distances <- dist2Line(points_sf, coast_line)
+
+# 4. Add to your data
+my_points$distance_to_land_m <- distances$dist
+print(my_points)
+
+
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(dplyr)
+
+coast <- ne_coastline(scale = "medium", returnclass = "sf")
+coast <- st_transform(coast, 3857)
+coast <- st_union(coast)   # VERY important for speed
+
