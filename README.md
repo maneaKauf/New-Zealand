@@ -1,6 +1,6 @@
-# Seagrass Project
+# ICRS Project
 
-This repository contains data and R scripts for the analysis of seagrass acroos Caribbean.
+This repository contains data and R scripts for the analysis of MPAs across the Caribbean.
 
 ## Folder Structure
 - `RawData/`: Contains all raw CSV data files.
